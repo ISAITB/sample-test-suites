@@ -19,9 +19,21 @@ jobs:
             if [ -d "$suite_dir" ]; then
               parent_dir=$(dirname "$suite_dir")  # Get parent directory path
               zip_name="$parent_dir/testSuite.zip"  # Path for ZIP file
-              
+
+              # Ensure we have write permissions
+              touch "$zip_name" || { echo "Error: Cannot create $zip_name"; exit 1; }
+
+              # Remove existing ZIP file if it exists
+              rm -f "$zip_name"              
+
               # Create ZIP archive of contents, excluding the "testSuite" folder itself
               (cd "$suite_dir" && zip -r "$zip_name" .)
+
+              # Confirm ZIP was created
+              if [ ! -f "$zip_name" ]; then
+                echo "Error: Failed to create ZIP for $suite_dir"
+                exit 1
+              fi              
             fi
           done
       - name: Configure Git
