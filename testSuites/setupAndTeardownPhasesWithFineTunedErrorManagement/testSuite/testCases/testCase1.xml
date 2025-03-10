@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcase id="testCase1" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/">
+    <metadata>
+        <gitb:name>Test case 1: Setup and teardown operations</gitb:name>
+        <gitb:version>1.0</gitb:version>
+        <gitb:description>Simulated exchanges illustrating how to do setup and teardown operations.</gitb:description>
+    </metadata>
+    <actors>
+        <gitb:actor id="Retailer" role="SUT"/>
+        <gitb:actor id="SimulatedRetailer"/>
+    </actors>
+    <steps>
+        <group title="Setup steps" collapsed="true" stopOnChildError="false">
+            <send desc="Create dataset 1" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging"/>
+            <send desc="Create dataset 2" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging"/>
+        </group>
+        <group hiddenContainer="true" stopOnChildError="true">
+            <group title="Step 1" desc="Check message 1">
+                <send desc="Send message 1" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging"/>
+                <process desc="Validate message 1" hidden="false" handler="DisplayProcessor"/>
+            </group>
+            <group title="Step 2" desc="Check message 2">
+                <send desc="Send message 2" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging"/>
+                <process desc="Validate message 2" hidden="false" handler="DisplayProcessor"/>
+            </group>
+            <group title="Step 3" desc="Check message 3">
+                <receive desc="Receive message 3" from="Retailer" to="SimulatedRetailer" handler="SimulatedMessaging"/>
+                <process desc="Validate message 3" hidden="false" handler="DisplayProcessor"/>
+            </group>
+        </group>
+        <group title="Teardown steps" collapsed="true" stopOnChildError="false">
+            <send desc="Remove dataset 1" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging" level="WARNING"/>
+            <send desc="Remove dataset 2" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging" level="WARNING"/>
+        </group>
+    </steps>
+    <output>
+        <success>
+            <default>"Test session completed successfully."</default>
+        </success>
+        <failure>
+            <default>"Test session failed. Check the step reports for details."</default>
+        </failure>
+    </output>
+</testcase>

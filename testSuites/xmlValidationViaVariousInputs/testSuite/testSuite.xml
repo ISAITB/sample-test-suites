@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite id="example1" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<metadata>
+		<gitb:name>Example 1: XML validations</gitb:name>
+		<gitb:description>Example focusing on different ways of performing XML validations.</gitb:description>
+		<gitb:version>1.0</gitb:version>
+	</metadata>
+	<actors>
+        <gitb:actor id="Retailer">
+            <gitb:name>Retailer</gitb:name>
+            <gitb:desc>The EU retailer system that needs to be capable of producing and processing purchase orders.</gitb:desc>
+        </gitb:actor>
+        <gitb:actor id="SimulatedRetailer">
+            <gitb:name>Simulated retailer</gitb:name>
+            <gitb:desc>A simulated EU retailer system used for testing purposes.</gitb:desc>
+        </gitb:actor>
+	</actors>
+	<testcase id="testCase1"/>
+	<testcase id="testCase2"/>
+</testsuite>

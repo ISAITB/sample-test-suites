@@ -1,0 +1,3 @@
+# Request and asynchronous polling for status update
+
+This is a more complex scenario that considers sending a request and then using a **polling approach** to check for its processing status. It involves reusing steps via **scriptlets**, generating messages using **templates**, **iterating** to make poll attempts following **delays**, making **conditional processing**, and extracting values from XML content using **XPath** expressions.

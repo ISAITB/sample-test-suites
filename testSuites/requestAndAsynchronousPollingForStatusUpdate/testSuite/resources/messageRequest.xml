@@ -1,0 +1,8 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:po="http://www.itb.ec.europa.eu/po/v1/">
+    <soap:Header/>
+    <soap:Body>
+        <po:request>
+            <po:message>This is a test</po:message>
+        </po:request>
+    </soap:Body>
+</soap:Envelope>

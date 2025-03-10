@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scriptlet id="validate" xmlns="http://www.gitb.com/tdl/v1/">
+    <params>
+        <var name="content" type="binary"/>
+        <var name="schema" type="binary"/>
+        <var name="description" type="string"><value>Validate structure</value></var>
+    </params>
+    <steps>
+        <log>"Validating content with JSON schema..."</log>
+        <assign to="schema1{schema}">$schema</assign>
+        <assign to="schemasToUse" append="true">$schema1</assign>
+        <verify handler="https://www.itb.ec.europa.eu/json/soap/any/validation?wsdl" desc="$description">
+            <input name="contentToValidate">$content</input>
+            <input name="externalSchemas">$schemasToUse</input>
+        </verify>        
+        <log>"Validation result was: " || $STEP_STATUS{validation}</log>
+    </steps>
+</scriptlet>

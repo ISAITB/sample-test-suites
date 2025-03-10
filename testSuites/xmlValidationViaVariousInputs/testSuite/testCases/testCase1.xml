@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcase id="testCase1" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/">
+    <metadata>
+        <gitb:name>Test case 1: Manual upload</gitb:name>
+        <gitb:version>1.0</gitb:version>
+        <gitb:description>Upload a valid purchase order for validation.</gitb:description>
+    </metadata>
+    <imports>
+        <artifact type="binary" name="sample">resources/sample.xml</artifact>
+        <artifact type="binary" name="sampleInvalid">resources/sampleInvalid.xml</artifact>
+    </imports>        
+    <actors>
+        <gitb:actor id="Retailer" role="SUT"/>
+        <gitb:actor id="SimulatedRetailer"/>
+    </actors>
+    <steps>
+        <interact id="userInput" inputTitle="Provide input" desc="Provide purchase order">
+            <request name="order" desc="Upload file" inputType="UPLOAD"/>
+            <instruct desc="Sample purchase order">$sample</instruct>
+            <instruct desc="Sample invalid purchase order">$sampleInvalid</instruct>
+        </interact>
+        <call path="scriptlets/validate.xml" input="$userInput{order}"/>
+    </steps>
+    <output>
+        <success>
+            <default>"Test session completed successfully."</default>
+        </success>
+        <failure>
+            <default>"Test session failed. Check the step reports for details."</default>
+        </failure>
+    </output>
+</testcase>

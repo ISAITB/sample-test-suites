@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scriptlet id="createSimulatedStatusResponse" xmlns="http://www.gitb.com/tdl/v1/">
+    <imports>
+        <artifact type="binary" name="ackResponseTemplate">resources/ackResponseTemplate.xml</artifact>
+    </imports>
+    <params>
+        <var name="correlationId" type="string"/>
+        <var name="maxAttempts" type="number"/>
+    </params>
+    <steps>
+        <assign to="simulatedStatusResponse">"PENDING"</assign>
+        <interact inputTitle="Simulation behaviour" hidden="true">
+            <request desc="Response to return from simulated status request" options="PENDING,FAILED,ACKNOWLEDGED">$simulatedStatusResponse</request>
+            <instruct desc="Help" forceDisplay="true">"Selecting 'FAILED' or 'ACKNOWLEDGED' will complete the simulated polling, while 'PENDING' will continue unless the maximum attempts (" || $maxAttempts || ") are reached."</instruct>
+        </interact>
+        <assign to="simulatedStatusResponse">if (string-length($simulatedStatusResponse) = 0) then "PENDING" else $simulatedStatusResponse</assign>
+        <log>"Considering " || $simulatedStatusResponse || " status response."</log>
+        <process handler="TokenGenerator" operation="timestamp" output="processingDate">
+            <input name="format">"dd/MM/yyyy'T'HH:mm:ss.SSSZ"</input>
+        </process>
+        <assign to="parameters{correlationId}">$correlationId</assign>
+        <assign to="parameters{status}">$simulatedStatusResponse</assign>
+        <assign to="parameters{processingDate}">$processingDate</assign>
+        <process output="ackResponse" handler="TemplateProcessor">
+            <input name="parameters">$parameters</input>
+            <input name="template">$ackResponseTemplate</input>
+            <input name="syntax">'freemarker'</input>
+        </process>
+    </steps>
+    <output name="ackResponse"/>
+</scriptlet>

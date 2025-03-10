@@ -1,0 +1,36 @@
+name: packageTestSuites
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+jobs:
+  archive:
+    name: Package test suites
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4    
+      - name: Install zip utility
+        run: sudo apt-get install -y zip
+      - name: Zip test suites
+        run: |
+          ROOT_DIR="testSuites"  # Base directory
+          for suite_dir in "$ROOT_DIR"/*/testSuite; do
+            if [ -d "$suite_dir" ]; then
+              parent_dir=$(dirname "$suite_dir")  # Get parent directory path
+              zip_name="$parent_dir/testSuite.zip"  # Path for ZIP file
+              
+              # Create ZIP archive of contents, excluding the "testSuite" folder itself
+              (cd "$suite_dir" && zip -r "$zip_name" .)
+            fi
+          done
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+      - name: Commit and push ZIP files
+        run: |
+          git add testSuites/*/*.zip
+          git commit -m "Add/Update test suite archives"
+          git push
+        continue-on-error: true  # Prevent failure if nothing to commit          

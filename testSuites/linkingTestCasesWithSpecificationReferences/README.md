@@ -1,0 +1,3 @@
+# Linking test cases with specification references
+
+This test suite illustrates how test cases can be displayed with **specification references**, when it is important to have direct traceability between test cases and normative requirements. The included tests cover **XML and JSON validation** using **built-in** and **remote** validators, for XML and JSON content received via **HTTP GET** requests. The different syntaxes handled by each test case are further highlighted using tags.

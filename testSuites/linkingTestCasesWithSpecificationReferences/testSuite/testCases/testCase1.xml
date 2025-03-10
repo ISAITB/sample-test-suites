@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcase id="testCase1" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/">
+    <metadata>
+        <gitb:name>Test case 1: Validate retrieved purchase order in XML</gitb:name>
+        <gitb:version>1.0</gitb:version>
+        <gitb:description>Provide a valid XML purchase order requested via HTTP GET.</gitb:description>
+        <gitb:tags>
+            <gitb:tag foreground="#FFFFFF" background="#16730B" name="XML">Test case covering XML syntax requirements.</gitb:tag>
+        </gitb:tags>
+        <gitb:specification>
+            <gitb:reference>XML Purchase Order specification</gitb:reference>
+            <gitb:link>https://www.itb.ec.europa.eu/docs/guides/latest/validatingXML/index.html#step-2-prepare-validation-artefacts</gitb:link>
+        </gitb:specification>
+    </metadata>
+    <imports>
+        <artifact type="binary" name="schema">resources/PurchaseOrder.xsd</artifact>
+    </imports>
+    <actors>
+        <gitb:actor id="Retailer" role="SUT"/>
+        <gitb:actor id="SimulatedRetailer"/>
+    </actors>
+    <steps>
+        <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
+            <input name="uri">"https://raw.githubusercontent.com/ISAITB/sample-test-workspace/refs/heads/master/samples/samplePO.xml"</input>
+            <input name="method">"GET"</input>
+        </send>
+        <log>"Validating content with XML schema..."</log>
+        <verify handler="XmlValidator" desc="Validate purchase order">
+            <input name="xml">$data{response}{body}</input>
+            <input name="xsd">$schema</input>
+        </verify>
+    </steps>
+    <output>
+        <success>
+            <default>"Test session completed successfully."</default>
+        </success>
+        <failure>
+            <default>"Test session failed. Check the step reports for details."</default>
+        </failure>
+    </output>    
+</testcase>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcase id="testCase1" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/">
+    <metadata>
+        <gitb:name>Test case 1: Validate JSON content</gitb:name>
+        <gitb:version>1.0</gitb:version>
+        <gitb:description>Validate JSON content retrieved from remote endpoint with built-in and generated schemas.</gitb:description>
+    </metadata>
+    <imports>
+        <artifact type="binary" name="schema">resources/schema.json</artifact>
+        <artifact type="binary" name="schemaTemplate">resources/schemaTemplate.txt</artifact>
+    </imports>
+    <actors>
+        <gitb:actor id="Retailer" role="SUT"/>
+        <gitb:actor id="SimulatedRetailer"/>
+    </actors>
+    <steps>
+        <process handler="TokenGenerator" output="orderDate">
+            <operation>timestamp</operation>
+            <input name="format">"yyyy-MM-dd"</input>
+        </process>
+        <assign to="expectedItemCount">1</assign>
+        <interact id="userInput" inputTitle="Instructions" hidden="true">
+            <instruct desc="Order date">"The purchase order is expected to have an order date of "||$orderDate||"."</instruct>
+            <instruct desc="Item count">"The purchase order must have "||$expectedItemCount||" item."</instruct>
+        </interact>
+        <send id="data" stopOnError="true" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
+            <input name="uri">"https://raw.githubusercontent.com/ISAITB/validator-resources-json-sample/refs/heads/master/etc/sample.json"</input>
+            <input name="method">"GET"</input>
+        </send>
+        <group title="Validations">
+            <call path="scriptlets/validate.xml">
+                <input name="content">$data{response}{body}</input>
+                <input name="schema">$schema</input>
+            </call>
+            <assign to="parameters{expectedOrderDate}">$orderDate</assign>
+            <process output="dynamicSchema" handler="TemplateProcessor">
+                <input name="parameters">$parameters</input>
+                <input name="template">$schemaTemplate</input>
+                <input name="syntax">'freemarker'</input>
+            </process>
+            <call path="scriptlets/validate.xml">
+                <input name="content">$data{response}{body}</input>
+                <input name="schema">$dynamicSchema</input>
+                <input name="description">"Validate content"</input>
+            </call>        
+        </group>
+    </steps>
+    <output>
+        <success>
+            <default>"Test session completed successfully."</default>
+        </success>
+        <failure>
+            <default>"Test session failed. Check the step reports for details."</default>
+        </failure>
+    </output>
+</testcase>

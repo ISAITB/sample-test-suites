@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scriptlet id="validate" xmlns="http://www.gitb.com/tdl/v1/">
+    <imports>
+        <artifact type="binary" name="schema">resources/PurchaseOrder.xsd</artifact>
+        <artifact type="binary" name="schematron">resources/LargePurchaseOrder.sch</artifact>
+    </imports>    
+    <params>
+        <var name="content" type="binary"/>
+    </params>
+    <steps>
+        <log>"Validating content against XSD and Schematron..."</log>
+        <assign to="schematrons" append="true">$schematron</assign>
+        <verify id="validation" handler="XmlValidator" desc="Validate purchase order">
+            <input name="xml">$content</input>
+            <input name="xsd">$schema</input>
+            <input name="schematron">$schematrons</input>
+            <input name="showValidationArtefacts">false()</input>
+        </verify>
+        <log>"Validation result was: " || $STEP_STATUS{validation}</log>
+    </steps>
+</scriptlet>

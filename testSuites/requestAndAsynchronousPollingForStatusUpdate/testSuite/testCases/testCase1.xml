@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcase id="testCase1" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/">
+    <metadata>
+        <gitb:name>Test case 1: Send message and poll for acknowledgement</gitb:name>
+        <gitb:version>1.0</gitb:version>
+        <gitb:description>Simulate sending an XML message (a SOAP envelope) and follow up with asynchronous polling requests for its processing status. The status request is dynamically generated using a template with an identifier from an XPath lookup on the initial request's response. The test succeeds if the message is reported as acknowledged. Exchanges are simulated and a user popup is used to provide the simulated status response to return for each poll attempt.</gitb:description>
+    </metadata>
+    <imports>
+        <artifact type="binary" name="request">resources/messageRequest.xml</artifact>
+        <artifact type="binary" name="response">resources/messageResponse.xml</artifact>
+        <artifact type="binary" name="ackRequestTemplate">resources/ackRequestTemplate.xml</artifact>
+    </imports>
+    <actors>
+        <gitb:actor id="Retailer" role="SUT"/>
+        <gitb:actor id="SimulatedRetailer"/>
+    </actors>
+    <namespaces>
+       <ns prefix="soap">http://schemas.xmlsoap.org/soap/envelope/</ns>
+       <ns prefix="po">http://www.itb.ec.europa.eu/po/v1/</ns>
+    </namespaces>    
+    <steps stopOnError="true">
+        <!-- In real life the handler would likely be SoapMessagingV2 for SOAP message exchanges -->
+        <assign to="messageParams{request}">$request</assign>
+        <assign to="messageParams{response}">$response</assign>
+        <assign to="messageContentTypes{request}">"application/xml"</assign>
+        <assign to="messageContentTypes{response}">"application/xml"</assign>
+        <log>"Sending request to retailer system..."</log>
+        <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging">
+            <input name="parameters">$messageParams</input>
+            <input name="contentTypes">$messageContentTypes</input>
+        </send>
+        <assign to="correlationId" source="$data{response}">/soap:Envelope/soap:Body/po:response/po:correlationId/text()</assign>
+        <log>"Received correlation ID was " || $correlationId</log>
+        <log>"Preparing status check message using template..."</log>
+        <assign to="templateParameters{correlationId}">$correlationId</assign>
+        <process output="ackRequest" handler="TemplateProcessor">
+            <input name="parameters">$templateParameters</input>
+            <input name="template">$ackRequestTemplate</input>
+            <input name="syntax">'freemarker'</input>
+        </process>
+        <!-- Steps to handle the simulated polling for the request's status -->
+        <assign to="attempt" type="number">1</assign>
+        <assign to="maxAttempts" type="number">5</assign>
+        <assign to="statusCheckDelay">3000</assign>
+        <assign to="status">"PENDING"</assign>
+        <while title="Status check" desc="Poll for acknowledgement">
+            <cond><![CDATA[$attempt <= $maxAttempts and $status = 'PENDING']]></cond>
+            <do>
+                <log>"Waiting for " || round((number($statusCheckDelay) div 1000)) || " seconds before status check..."</log>
+                <process handler="DelayProcessor" operation="delay" input="$statusCheckDelay"/>
+                <log>"Checking for acknowledgement (attempt " || $attempt || " of " || $maxAttempts || ")..."</log>
+                <call path="scriptlets/createSimulatedStatusResponse.xml" output="ackResponse">
+                    <input name="correlationId">$correlationId</input>
+                    <input name="maxAttempts">$maxAttempts</input>
+                </call>
+                <assign to="ackParams{request}">$ackRequest</assign>
+                <assign to="ackParams{response}">$ackResponse</assign>
+                <assign to="ackContentTypes{request}">"application/xml"</assign>
+                <assign to="ackContentTypes{response}">"application/xml"</assign>
+                <send id="ack" desc="Request status" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging">
+                    <input name="parameters">$ackParams</input>
+                    <input name="contentTypes">$ackContentTypes</input>
+                </send>
+                <assign to="status" source="$ack{response}">/soap:Envelope/soap:Body/po:statusResponse/po:status/text()</assign>
+                <assign to="attempt" type="number">$attempt + 1</assign>
+            </do>
+        </while>
+        <verify id="checkStatus" desc="Ensure message was acknowledged" handler="StringValidator">
+            <input name="actualstring">$status</input>
+            <input name="expectedstring">"ACKNOWLEDGED"</input>
+        </verify>
+    </steps>
+    <output>
+        <success>
+            <default>"Test session completed successfully."</default>
+        </success>
+        <failure>
+            <case>
+                <cond>$status = "FAILED"</cond>
+                <message>"The message was not processed correctly."</message>
+            </case>
+            <case>
+                <cond>$status = "PENDING"</cond>
+                <message>"The message failed to be acknowledged after " || $maxAttempts || " attempts."</message>
+            </case>
+            <default>"Test session failed. Check the step reports for details."</default>
+        </failure>
+    </output>    
+</testcase>

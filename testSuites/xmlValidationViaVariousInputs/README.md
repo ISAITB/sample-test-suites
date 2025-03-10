@@ -1,0 +1,3 @@
+# Validation of XML content via various inputs
+
+This example showcases validation of XML content using the Test Bed’s built-in **XML validation** capabilities. The test suite includes two test cases covering the different ways in which the XML to validate is provided, specifically through **manual upload** and **HTTP request**. The validation logic is defined once and **reused** across both test cases.

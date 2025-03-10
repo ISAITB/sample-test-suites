@@ -1,0 +1,3 @@
+# Setup and teardown phases with fine-tuned error management
+
+This test suite illustrates the use of **step groups** and **error management flags** to split a test case into sections with different execution behaviours. The included test case splits its steps into setup, main and teardown phases, ensuring that setup and teardown steps always execute and never fail test sessions, whereas main steps fail eagerly. Besides managing step failures, **group display features** are used such as collapsing the display of setup and teardown steps, and hiding the group boundary for the main steps’ group.

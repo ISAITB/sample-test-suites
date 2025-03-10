@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcase id="testCase4" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/">
+    <metadata>
+        <gitb:name>Test case 4: Simulated retrieval of valid data</gitb:name>
+        <gitb:version>1.0</gitb:version>
+        <gitb:description>Simulated retrieval and validation of valid data via HTTP GET.</gitb:description>
+        <gitb:tags>
+            <gitb:tag foreground="#FFFFFF" background="#FF2E00" name="simulated">Test case with simulated exchanges for demo purposes.</gitb:tag>
+        </gitb:tags>
+        <gitb:documentation import="docs/testCase4.html"/>
+    </metadata>
+    <imports>
+        <artifact type="binary" name="sampleFile">resources/sample.xml</artifact>
+    </imports>
+    <actors>
+        <gitb:actor id="Retailer" role="SUT"/>
+        <gitb:actor id="SimulatedRetailer"/>
+    </actors>
+    <steps>
+        <assign to="params1{content}">$sampleFile</assign>
+        <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging">
+            <input name="parameters">$params1</input>
+        </send>        
+        <call path="scriptlets/validate.xml" input="$sampleFile"/>
+    </steps>
+    <output>
+        <success>
+            <default>"Test session completed successfully."</default>
+        </success>
+        <failure>
+            <default>"Test session failed. Check the step reports for details."</default>
+        </failure>
+    </output>    
+</testcase>

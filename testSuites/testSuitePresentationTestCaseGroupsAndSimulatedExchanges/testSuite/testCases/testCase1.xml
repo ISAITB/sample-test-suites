@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcase id="testCase1" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/">
+    <metadata>
+        <gitb:name>Test case 1: Validate retrieved purchase order</gitb:name>
+        <gitb:version>1.0</gitb:version>
+        <gitb:description>Provide a valid purchase order when requested via HTTP GET.</gitb:description>
+        <gitb:documentation import="docs/testCase1.html"/>
+    </metadata>
+    <actors>
+        <gitb:actor id="Retailer" role="SUT"/>
+        <gitb:actor id="SimulatedRetailer"/>
+    </actors>
+    <steps>
+        <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
+            <input name="uri">"https://raw.githubusercontent.com/ISAITB/sample-test-workspace/refs/heads/master/samples/samplePO.xml"</input>
+            <input name="method">"GET"</input>
+        </send>        
+        <call id="validation" path="scriptlets/validate.xml" input="$data{response}{body}"/>
+    </steps>
+    <output>
+        <success>
+            <default>"Test session completed successfully."</default>
+        </success>
+        <failure>
+            <case>
+                <cond>$STEP_STATUS{data} = 'ERROR'</cond>
+                <message>"Failed to retrieve content to validate from configured endpoint."</message>
+            </case>
+            <case>
+                <cond>$STEP_STATUS{validation} = 'ERROR'</cond>
+                <message>"Validation of retrieved data failed."</message>
+            </case>
+            <default>"Test session failed. Check the step reports for details."</default>
+        </failure>
+    </output>    
+</testcase>

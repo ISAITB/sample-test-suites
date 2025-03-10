@@ -1,0 +1,6 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:po="http://www.itb.ec.europa.eu/po/v1/">
+    <soap:Header/>
+    <soap:Body>
+        <po:statusRequest correlationId="${correlationId}"/>
+    </soap:Body>
+</soap:Envelope>
