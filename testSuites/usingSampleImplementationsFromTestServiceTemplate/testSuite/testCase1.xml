@@ -5,10 +5,8 @@
         <gitb:version>1.0</gitb:version>
         <gitb:description>Test case illustrating a sample use of the template service sample implementations.</gitb:description>
     </metadata>
-    <variables>
-        <var name="messageToSend" type="string"/>
-    </variables>
     <actors>
+        <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
         <gitb:actor id="actor1" name="Actor 1" role="SUT"/>
         <gitb:actor id="actor2" name="Actor 2"/>
     </actors>
@@ -16,14 +14,14 @@
         <!--
             Request the message to send to the messaging service.
         -->
-        <interact desc="Request message">
-            <request desc="Enter the message to send:">$messageToSend</request>
+        <interact id="data" desc="Request message">
+            <request name="messageToSend" desc="Enter the message to send:"/>
         </interact>
         <!--
             Send the message.
         -->
         <send id="step1" desc="Send message" from="actor1" to="actor2" handler="$DOMAIN{messagingServiceAddress}">
-            <input name="messageToSend">$messageToSend</input>
+            <input name="messageToSend">$data{messageToSend}</input>
         </send>
         <!--
             Receive a response message.

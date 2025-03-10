@@ -5,6 +5,12 @@
 		<gitb:description>Example focusing on simulated and actual exchanges as well as presentation features. At least one simulated test case must be completed.</gitb:description>
 		<gitb:version>1.0</gitb:version>
 	</metadata>
+	<!-- 
+		Define the actors involved in the test suite. The test cases referencing an actor with the role of SUT (System Under Test)
+		must be passed to complete conformance testing.
+
+		Depending on options selected during the test suite's upload, the actor definitions will be created or updated in the target specification.
+	-->
 	<actors>
         <gitb:actor id="Retailer">
             <gitb:name>Retailer</gitb:name>
@@ -15,12 +21,20 @@
             <gitb:desc>A simulated EU retailer system used for testing purposes.</gitb:desc>
         </gitb:actor>
 	</actors>
+    <!--
+        Definition of test case groups. A group including a set of test cases needs only have one test case pass in order to be considered
+        successful.
+    -->
     <groups>
         <group id="group1">
             <name>Demos</name>
             <desc>Test cases based on simulation to demonstrate </desc>
         </group>
     </groups>
+	<!-- 
+		The list of included test cases (referenced using their ID). The ordering of the test cases here defines their execution
+		order when running the test suite. Using the 'group' attribute, test cases are linked to defined groups.
+	-->
 	<testcase id="testCase1"/>
 	<testcase id="testCase2" group="group1"/>
 	<testcase id="testCase3" group="group1"/>

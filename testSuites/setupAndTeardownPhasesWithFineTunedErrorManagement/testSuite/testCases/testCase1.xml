@@ -6,14 +6,26 @@
         <gitb:description>Simulated exchanges illustrating how to do setup and teardown operations.</gitb:description>
     </metadata>
     <actors>
+        <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
         <gitb:actor id="Retailer" role="SUT"/>
         <gitb:actor id="SimulatedRetailer"/>
     </actors>
+    <!-- By default steps will continue executing if errors come up. -->
     <steps>
+        <!-- 
+            Define a group, presented by default as collapsed, for which we want to continue execution in case a step fails.
+            This is the group with setup steps, which we ensure will all execute before proceeding.
+        -->
         <group title="Setup steps" collapsed="true" stopOnChildError="false">
             <send desc="Create dataset 1" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging"/>
             <send desc="Create dataset 2" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging"/>
         </group>
+        <!--
+            In this group we hide the group's boundary using the 'hiddenContainer' attribute as we want to only show its included
+            steps. In effect we are using a group step here to provide aggregated behaviour rather than a visual grouping. The
+            behaviour in question is defined by setting 'stopOnChildError' to true that will stop execution of the group's
+            steps (but not of the overall test session) if a step fails.
+        -->
         <group hiddenContainer="true" stopOnChildError="true">
             <group title="Step 1" desc="Check message 1">
                 <send desc="Send message 1" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging"/>
@@ -28,11 +40,18 @@
                 <process desc="Validate message 3" hidden="false" handler="DisplayProcessor"/>
             </group>
         </group>
+        <!--
+            This group is used to define the teardown steps. These are presented as collapsed by default and we set the 
+            'stopOnChildError' flag to false to ensure all steps execute. In addition, all included steps (assumed to be 
+            REST calls but simulated here for convenience), are marked with a 'level' set to 'WARNING' so that teardown
+            steps will not cause the test session to fail in case of error.
+        -->
         <group title="Teardown steps" collapsed="true" stopOnChildError="false">
             <send desc="Remove dataset 1" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging" level="WARNING"/>
             <send desc="Remove dataset 2" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging" level="WARNING"/>
         </group>
     </steps>
+    <!-- Print a user-friendly message to summarise the test session's outcome. -->
     <output>
         <success>
             <default>"Test session completed successfully."</default>

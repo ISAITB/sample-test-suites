@@ -5,21 +5,32 @@
         <gitb:version>1.0</gitb:version>
         <gitb:description>Simulate sending an XML message (a SOAP envelope) and follow up with asynchronous polling requests for its processing status. The status request is dynamically generated using a template with an identifier from an XPath lookup on the initial request's response. The test succeeds if the message is reported as acknowledged. Exchanges are simulated and a user popup is used to provide the simulated status response to return for each poll attempt.</gitb:description>
     </metadata>
+    <!-- Definition of imported resources that will be used in this test case. -->
     <imports>
         <artifact type="binary" name="request">resources/messageRequest.xml</artifact>
         <artifact type="binary" name="response">resources/messageResponse.xml</artifact>
         <artifact type="binary" name="ackRequestTemplate">resources/ackRequestTemplate.xml</artifact>
     </imports>
     <actors>
+        <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
         <gitb:actor id="Retailer" role="SUT"/>
         <gitb:actor id="SimulatedRetailer"/>
     </actors>
+    <!-- We define namespaces to be used for simpler and more precise XPath expressions. -->
     <namespaces>
        <ns prefix="soap">http://schemas.xmlsoap.org/soap/envelope/</ns>
        <ns prefix="po">http://www.itb.ec.europa.eu/po/v1/</ns>
-    </namespaces>    
+    </namespaces>
+    <!-- We set the 'stopOnError' flag to true so that any error will immediately stop the test execution. -->
     <steps stopOnError="true">
-        <!-- In real life the handler would likely be SoapMessagingV2 for SOAP message exchanges -->
+        <!-- 
+            Send the initial XML message to the SUT. We use here for illustration purposes the 'SimulatedMessaging' handler,
+            however in real life as this would be a SOAP service call we would likely be using the 'SoapMessagingV2' handler.
+
+            When using the 'SimulatedMessaging' handler we define the data that we want to show for the simulated exchange.
+            In this case it is a 'request' and 'response' map including the sample request and response files from our imports.
+            We also set the content types of these files so that they are presented with XML syntax highlighting when viewed.
+        -->
         <assign to="messageParams{request}">$request</assign>
         <assign to="messageParams{response}">$response</assign>
         <assign to="messageContentTypes{request}">"application/xml"</assign>
@@ -29,30 +40,54 @@
             <input name="parameters">$messageParams</input>
             <input name="contentTypes">$messageContentTypes</input>
         </send>
+        <!--
+            Use an XPath expression on the received XML data to extract the correlation identifier. Note here how we use
+            the 'soap' and 'po' namespaces we defined previously in the 'namespaces' section.
+        -->
         <assign to="correlationId" source="$data{response}">/soap:Envelope/soap:Body/po:response/po:correlationId/text()</assign>
+        <!-- 
+            Notice here that the log step takes an XPath expression (XPath being the TDL's built-in expression language). In this
+            case we use the '||' operator for string concatenation.
+        -->
         <log>"Received correlation ID was " || $correlationId</log>
         <log>"Preparing status check message using template..."</log>
         <assign to="templateParameters{correlationId}">$correlationId</assign>
+        <!--
+            Use the 'TemplateProcessor' in a process step to generate the ackRequest from an imported template. This template will
+            replace its placeholders using the values provided through the 'parameters' input map.
+        -->
         <process output="ackRequest" handler="TemplateProcessor">
             <input name="parameters">$templateParameters</input>
             <input name="template">$ackRequestTemplate</input>
             <input name="syntax">'freemarker'</input>
         </process>
-        <!-- Steps to handle the simulated polling for the request's status -->
+        <!--
+            Steps to handle the simulated polling for the request's status.
+        -->
         <assign to="attempt" type="number">1</assign>
         <assign to="maxAttempts" type="number">5</assign>
         <assign to="statusCheckDelay">3000</assign>
         <assign to="status">"PENDING"</assign>
+        <!-- 
+            Use a while step to loop until we have either reached our maximum attempts, or if the acknowledgement is no longer pending.
+        -->
         <while title="Status check" desc="Poll for acknowledgement">
+            <!-- Define the loop's condition in a CDATA block as we want to use the less than operator (which would result in invalid XML otherwise). -->
             <cond><![CDATA[$attempt <= $maxAttempts and $status = 'PENDING']]></cond>
             <do>
                 <log>"Waiting for " || round((number($statusCheckDelay) div 1000)) || " seconds before status check..."</log>
+                <!-- Use the 'DelayProcessor' to pause execution for a given duration. -->
                 <process handler="DelayProcessor" operation="delay" input="$statusCheckDelay"/>
                 <log>"Checking for acknowledgement (attempt " || $attempt || " of " || $maxAttempts || ")..."</log>
+                <!-- 
+                    Call a scriptlet that defines the steps to create the simulated status response. We do this here because we are simulating the exchange.
+                    In the real world we would simply make the call and check the received response.
+                -->
                 <call path="scriptlets/createSimulatedStatusResponse.xml" output="ackResponse">
                     <input name="correlationId">$correlationId</input>
                     <input name="maxAttempts">$maxAttempts</input>
                 </call>
+                <!-- Make a simulated call to the SUT. -->
                 <assign to="ackParams{request}">$ackRequest</assign>
                 <assign to="ackParams{response}">$ackResponse</assign>
                 <assign to="ackContentTypes{request}">"application/xml"</assign>
@@ -61,24 +96,30 @@
                     <input name="parameters">$ackParams</input>
                     <input name="contentTypes">$ackContentTypes</input>
                 </send>
+                <!-- Use an XPath expression to retrieve the status value from the response. -->
                 <assign to="status" source="$ack{response}">/soap:Envelope/soap:Body/po:statusResponse/po:status/text()</assign>
+                <!-- Increase the counter of attempts. -->
                 <assign to="attempt" type="number">$attempt + 1</assign>
             </do>
         </while>
+        <!-- Check to ensure that the polling completed with the reported status being 'ACKNOWLEDGED'. -->
         <verify id="checkStatus" desc="Ensure message was acknowledged" handler="StringValidator">
             <input name="actualstring">$status</input>
             <input name="expectedstring">"ACKNOWLEDGED"</input>
         </verify>
     </steps>
+    <!-- Print a user-friendly message to summarise the test session's outcome. -->
     <output>
         <success>
             <default>"Test session completed successfully."</default>
         </success>
         <failure>
+            <!-- Print a specific message if the reported status was 'FAILED'. -->
             <case>
                 <cond>$status = "FAILED"</cond>
                 <message>"The message was not processed correctly."</message>
             </case>
+            <!-- Print a specific message if we stopped polling because we reached the maximum attempts. -->
             <case>
                 <cond>$status = "PENDING"</cond>
                 <message>"The message failed to be acknowledged after " || $maxAttempts || " attempts."</message>

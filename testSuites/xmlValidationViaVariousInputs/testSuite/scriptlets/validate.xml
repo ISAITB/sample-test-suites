@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scriptlet id="validate" xmlns="http://www.gitb.com/tdl/v1/">
+    <!-- Imports for the XSD and Schematron files to use for XML validation. -->
     <imports>
         <artifact type="binary" name="schema">resources/PurchaseOrder.xsd</artifact>
         <artifact type="binary" name="schematron">resources/LargePurchaseOrder.sch</artifact>
     </imports>    
+    <!-- Scriptlet input parameter for the XML data to validate.-->
     <params>
         <var name="content" type="binary"/>
     </params>
     <steps>
         <log>"Validating content against XSD and Schematron..."</log>
+        <!--
+            Use the built-in 'XmlValidator' handler to validated the provided XML data against the 
+            configured XSD and Schematron (imported previously).
+        -->
         <assign to="schematrons" append="true">$schematron</assign>
         <verify id="validation" handler="XmlValidator" desc="Validate purchase order">
             <input name="xml">$content</input>
@@ -16,6 +22,7 @@
             <input name="schematron">$schematrons</input>
             <input name="showValidationArtefacts">false()</input>
         </verify>
+        <!-- We can refer to previous steps' outcomes using the built-in STEP_STATUS map. -->
         <log>"Validation result was: " || $STEP_STATUS{validation}</log>
     </steps>
 </scriptlet>

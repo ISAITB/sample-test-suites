@@ -1,10 +1,11 @@
 # Sample GITB TDL test suites
 
-Repository of sample [GITB Test Description Language (TDL)](https://www.itb.ec.europa.eu/docs/tdl/latest/) test suites referenced from the Test Bed's documentation. The provided test suites can typically be uploaded as-is to a [GITB Test Bed](https://github.com/ISAITB/gitb) instance and used for experimentation.
+Repository of sample [GITB Test Description Language (TDL)](https://www.itb.ec.europa.eu/docs/tdl/latest/) test suites referenced from the Test Bed's documentation.
+The provided test suites can typically be uploaded as-is to a [GITB Test Bed](https://github.com/ISAITB/gitb) instance and used for experimentation.
 
 The `testSuites` folder contains all test suite samples, each defined within a sub-folder named to indicate the test suite's purpose. Each such test suite sub-folder contains the following:
 
-* A folder named `testSuite` including the test suite's full resources.
+* A folder named `testSuite` including the test suite's full resources. Detailed comments are provided in each test case to highlight important information.
 * A `testSuite.zip` archive that can be deployed to a GITB Test BEd instance. This is essentially an archive of the `testSuite` folder's contents (without including the `testSuite` folder itself).
 * A `README.md` file that includes a brief description of what the test suite showcases.
 

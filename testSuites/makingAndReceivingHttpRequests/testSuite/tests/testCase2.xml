@@ -5,14 +5,21 @@
         <gitb:version>1.0</gitb:version>
         <gitb:description>Test case to test that an EU retailer system can correctly send a purchase order.</gitb:description>
     </metadata>
+    <!-- Define the XSD to use for validations as an imported resource. -->
     <imports>
         <artifact type="schema" encoding="UTF-8" name="purchaseOrderXSD">resources/PurchaseOrder.xsd</artifact>
     </imports>
     <actors>
+        <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
         <gitb:actor id="Retailer" name="Retailer" role="SUT"/>
         <gitb:actor id="SimulatedRetailer" name="Simulated retailer"/>
     </actors>
     <steps>
+        <!-- 
+            Use a 'receive' step with the built-in 'HttpMessagingV2' handler to wait until a POST is received matching the provided URI extension ('/receiveOrder').
+            Once received, the request will be responded to with a 200 (OK) response including fixed reference identifier
+            as the payload, which is defined as being of type "text/plain".
+        -->
         <assign to="httpHeaders{Content-Type}">"text/plain"</assign>
         <receive id="dataReceived" desc="Receive request" from="Retailer" to="SimulatedRetailer" handler="HttpMessagingV2">
             <input name="uriExtension">"/receiveOrder"</input>
@@ -21,11 +28,13 @@
             <input name="body">"REF-0123456789"</input>
             <input name="headers">$httpHeaders</input>
         </receive>
+        <!-- Validate the received data using the imported schema. Validation takes place using the built-in 'XmlValidator' handler. -->
         <verify handler="XmlValidator" desc="Validate purchase order">
             <input name="xml">$dataReceived{request}{body}</input>
             <input name="xsd">$purchaseOrderXSD</input>
         </verify>
     </steps>
+    <!-- Print a user-friendly message to summarise the test session's outcome. -->
     <output>
         <success>
             <default>"Test session succeeded."</default>

@@ -5,39 +5,59 @@
         <gitb:version>1.0</gitb:version>
         <gitb:description>Validate JSON content retrieved from remote endpoint with built-in and generated schemas.</gitb:description>
     </metadata>
+    <!-- Import resources from the test suite to be used in this test case. -->
     <imports>
         <artifact type="binary" name="schema">resources/schema.json</artifact>
         <artifact type="binary" name="schemaTemplate">resources/schemaTemplate.txt</artifact>
     </imports>
     <actors>
+        <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
         <gitb:actor id="Retailer" role="SUT"/>
         <gitb:actor id="SimulatedRetailer"/>
     </actors>
     <steps>
+        <!-- Use the 'TokenGenerator' to create a timestamp for the current date/time using the expected format. -->
         <process handler="TokenGenerator" output="orderDate">
             <operation>timestamp</operation>
             <input name="format">"yyyy-MM-dd"</input>
         </process>
+        <!-- 
+            Use an interact step to highlight to the user the expectations on the data to be validated.
+            We set the step as 'hidden' so that the step is executed but not displayed in the execution diagram.
+        -->
         <assign to="expectedItemCount">1</assign>
         <interact id="userInput" inputTitle="Instructions" hidden="true">
             <instruct desc="Order date">"The purchase order is expected to have an order date of "||$orderDate||"."</instruct>
             <instruct desc="Item count">"The purchase order must have "||$expectedItemCount||" item."</instruct>
         </interact>
+        <!-- 
+            Make a HTTP GET to the target endpoint (provided here via a fixed URL) to retrieve the data to validate.
+            In the real world we would expect that the endpoint address of the SUT would be part of the configuration,
+            most likely defined as a custom system-level property in the relevant community. In this case the endpoint
+            address would be referred to as $SYSTEM{address} (assuming the property's key is 'address').
+        -->
         <send id="data" stopOnError="true" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
             <input name="uri">"https://raw.githubusercontent.com/ISAITB/validator-resources-json-sample/refs/heads/master/etc/sample.json"</input>
             <input name="method">"GET"</input>
         </send>
+        <!-- Define a group for a better visual presentation of the validations to perform. -->
         <group title="Validations">
+            <!-- Validate against the JSON schema (imported previously) by delegating to a scriptlet. -->
             <call path="scriptlets/validate.xml">
                 <input name="content">$data{response}{body}</input>
                 <input name="schema">$schema</input>
             </call>
+            <!-- 
+                Use the 'TemplateProcessor' to generate on the fly a JSON schema based on a template (imported previously).
+                This takes the generated order date and uses it to replace the relevant placeholder from the template.
+            -->
             <assign to="parameters{expectedOrderDate}">$orderDate</assign>
             <process output="dynamicSchema" handler="TemplateProcessor">
                 <input name="parameters">$parameters</input>
                 <input name="template">$schemaTemplate</input>
                 <input name="syntax">'freemarker'</input>
             </process>
+            <!-- Validated against the generated JSON schema by calling the same scriptlet as before. -->
             <call path="scriptlets/validate.xml">
                 <input name="content">$data{response}{body}</input>
                 <input name="schema">$dynamicSchema</input>
@@ -45,6 +65,7 @@
             </call>        
         </group>
     </steps>
+    <!-- Print a user-friendly message to summarise the test session's outcome. -->
     <output>
         <success>
             <default>"Test session completed successfully."</default>

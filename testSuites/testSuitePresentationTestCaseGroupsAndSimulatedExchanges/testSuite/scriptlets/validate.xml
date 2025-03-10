@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scriptlet id="validate" xmlns="http://www.gitb.com/tdl/v1/">
+    <!-- Imports from the test suite's resources to define the XSD and Schematron files to use in validations. -->
     <imports>
         <artifact type="binary" name="schema">resources/PurchaseOrder.xsd</artifact>
         <artifact type="binary" name="schematron">resources/LargePurchaseOrder.sch</artifact>
-    </imports>    
+    </imports>
+    <!-- The input parameter with the content to validate. -->
     <params>
         <var name="content" type="binary"/>
     </params>
     <steps>
         <log>"Validating content against XSD and Schematron..."</log>
+        <!-- 
+            Use the built-in 'XmlValidator' to validate the XML content against the imported 
+            XSD and Schematron. Note that we define Schematron files in a list given that we can have multiple.
+        -->
         <assign to="schematrons" append="true">$schematron</assign>
         <verify id="validation" handler="XmlValidator" desc="Validate purchase order">
             <input name="xml">$content</input>

@@ -4,14 +4,17 @@
         <gitb:name>Test case 2: Validate retrieved purchase order in JSON</gitb:name>
         <gitb:version>1.0</gitb:version>
         <gitb:description>Provide a valid JSON purchase order requested via HTTP GET.</gitb:description>
+        <!-- Define a tag to better highlight traits of this test case. -->
         <gitb:tags>
             <gitb:tag foreground="#FFFFFF" background="#FF2E00" name="JSON">Test case covering JSON syntax requirements.</gitb:tag>
         </gitb:tags>
+        <!-- Add a reference and link to a relevant normative specification. -->
         <gitb:specification>
             <gitb:reference>JSON Purchase Order specification</gitb:reference>
             <gitb:link>https://www.itb.ec.europa.eu/docs/guides/latest/validatingJSON/index.html#step-2-prepare-validation-artefacts</gitb:link>
         </gitb:specification>
     </metadata>
+    <!-- Define the JSON Schema to use for validations as an imported resource. -->
     <imports>
         <artifact type="binary" name="schema">resources/PurchaseOrder.json</artifact>
     </imports>
@@ -20,11 +23,17 @@
         <gitb:actor id="SimulatedRetailer"/>
     </actors>
     <steps>
+        <!-- Make a HTTP GET call to retrieve the data to validate with. -->
         <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
             <input name="uri">"https://raw.githubusercontent.com/ISAITB/validator-resources-json-sample/refs/heads/master/etc/sample.json"</input>
             <input name="method">"GET"</input>
         </send>
         <log>"Validating content with JSON schema..."</log>
+        <!-- 
+            Validate the retrieved data using the imported schema. Validation takes place using an external service, specifically the Test Bed's generic JSON validator. 
+            This validator is configured without predefined JSON schemas but rather expects these to be provided as part of the input. The two 'assign' steps serve to
+            prepare the schema that will be provided to the validator, referring to the test case's imported schema.
+        -->
         <assign to="schema1{schema}">$schema</assign>
         <assign to="schemasToUse" append="true">$schema1</assign>
         <verify handler="https://www.itb.ec.europa.eu/json/soap/any/validation?wsdl" desc="Validate purchase order">
@@ -32,6 +41,7 @@
             <input name="externalSchemas">$schemasToUse</input>
         </verify>
     </steps>
+    <!-- Print a user-friendly message to summarise the test session's outcome. -->
     <output>
         <success>
             <default>"Test session completed successfully."</default>

@@ -5,21 +5,26 @@
         <gitb:version>1.0</gitb:version>
         <gitb:description>Test case that allows the developer of an EU retailer system to upload a purchase order for validation.</gitb:description>
     </metadata>
+    <!-- Define the XSD to use for validations as an imported resource. -->
     <imports>
         <artifact type="schema" encoding="UTF-8" name="purchaseOrderXSD">resources/PurchaseOrder.xsd</artifact>
     </imports>
     <actors>
+        <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
         <gitb:actor id="Retailer" name="Retailer" role="SUT"/>
     </actors>
     <steps>
+        <!-- Display a popup to the user to request the XML file to validate (as an uploaded file). -->
         <interact id="userData" desc="Upload purchase order">
             <request desc="Purchase order to validate:" name="order" inputType="UPLOAD"/>
         </interact>
+        <!-- Validate the uploaded file using the imported schema. Validation takes place using the built-in 'XmlValidator' handler. -->
         <verify handler="XmlValidator" desc="Validate purchase order">
             <input name="xml">$userData{order}</input>
             <input name="xsd">$purchaseOrderXSD</input>
         </verify>
     </steps>
+    <!-- Print a user-friendly message to summarise the test session's outcome. -->
     <output>
         <success>
             <default>"Test session succeeded."</default>

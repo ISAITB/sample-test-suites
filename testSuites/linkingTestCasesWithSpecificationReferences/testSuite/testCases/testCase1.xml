@@ -4,14 +4,17 @@
         <gitb:name>Test case 1: Validate retrieved purchase order in XML</gitb:name>
         <gitb:version>1.0</gitb:version>
         <gitb:description>Provide a valid XML purchase order requested via HTTP GET.</gitb:description>
+        <!-- Define a tag to better highlight traits of this test case. -->
         <gitb:tags>
             <gitb:tag foreground="#FFFFFF" background="#16730B" name="XML">Test case covering XML syntax requirements.</gitb:tag>
         </gitb:tags>
+        <!-- Add a reference and link to a relevant normative specification. -->
         <gitb:specification>
             <gitb:reference>XML Purchase Order specification</gitb:reference>
             <gitb:link>https://www.itb.ec.europa.eu/docs/guides/latest/validatingXML/index.html#step-2-prepare-validation-artefacts</gitb:link>
         </gitb:specification>
     </metadata>
+    <!-- Define the XSD to use for validations as an imported resource. -->
     <imports>
         <artifact type="binary" name="schema">resources/PurchaseOrder.xsd</artifact>
     </imports>
@@ -20,16 +23,19 @@
         <gitb:actor id="SimulatedRetailer"/>
     </actors>
     <steps>
+        <!-- Make a HTTP GET call to retrieve the data to validate with. -->
         <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
             <input name="uri">"https://raw.githubusercontent.com/ISAITB/sample-test-workspace/refs/heads/master/samples/samplePO.xml"</input>
             <input name="method">"GET"</input>
         </send>
         <log>"Validating content with XML schema..."</log>
+        <!-- Validate the retrieved data using the imported schema. Validation takes place using the built-in 'XmlValidator' handler. -->
         <verify handler="XmlValidator" desc="Validate purchase order">
             <input name="xml">$data{response}{body}</input>
             <input name="xsd">$schema</input>
         </verify>
     </steps>
+    <!-- Print a user-friendly message to summarise the test session's outcome. -->
     <output>
         <success>
             <default>"Test session completed successfully."</default>

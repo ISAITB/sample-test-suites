@@ -6,16 +6,25 @@
         <gitb:description>Provide a valid purchase order when requested via HTTP GET.</gitb:description>
     </metadata>
     <actors>
+        <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
         <gitb:actor id="Retailer" role="SUT"/>
         <gitb:actor id="SimulatedRetailer"/>
     </actors>
     <steps>
+        <!--
+            Use a send step with the built-in 'HttpMessagingV2' handler to make a HTTP GET call to retrieve the data to validate from the SUT.
+            In the real world we would expect that the endpoint address of the SUT would be part of the configuration, most likely defined
+            as a custom system-level property in the relevant community. In this case the endpoint address would be referred to as 
+            $SYSTEM{address} (assuming the property's key is 'address').
+        -->
         <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
             <input name="uri">"https://raw.githubusercontent.com/ISAITB/sample-test-workspace/refs/heads/master/samples/samplePO.xml"</input>
             <input name="method">"GET"</input>
-        </send>        
+        </send>
+        <!-- Delegate the XML data's validation to a scriptlet. -->
         <call path="scriptlets/validate.xml" input="$data{response}{body}"/>
     </steps>
+    <!-- Print a user-friendly message to summarise the test session's outcome. -->
     <output>
         <success>
             <default>"Test session completed successfully."</default>

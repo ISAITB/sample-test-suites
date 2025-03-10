@@ -4,28 +4,37 @@
         <gitb:name>Test case 1: Validate retrieved purchase order</gitb:name>
         <gitb:version>1.0</gitb:version>
         <gitb:description>Provide a valid purchase order when requested via HTTP GET.</gitb:description>
+        <!-- Include HTML documentation for the test case, imported from a HTML file included in the test suite. -->
         <gitb:documentation import="docs/testCase1.html"/>
     </metadata>
     <actors>
+        <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
         <gitb:actor id="Retailer" role="SUT"/>
         <gitb:actor id="SimulatedRetailer"/>
     </actors>
     <steps>
+        <!--
+            Use the send step with the built-in 'HttpMessagingV2' handler to make a HTTP GET call to retrieve the content to validate.
+        -->
         <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
             <input name="uri">"https://raw.githubusercontent.com/ISAITB/sample-test-workspace/refs/heads/master/samples/samplePO.xml"</input>
             <input name="method">"GET"</input>
-        </send>        
+        </send>
+        <!-- Call the scriptlet that will handle the validations passing it the received body with the XML data to validate. -->
         <call id="validation" path="scriptlets/validate.xml" input="$data{response}{body}"/>
     </steps>
+    <!-- Print a user-friendly message to summarise the test session's outcome. -->
     <output>
         <success>
             <default>"Test session completed successfully."</default>
         </success>
         <failure>
+            <!-- Print a specific failure message if the call to the endpoint failed. -->
             <case>
                 <cond>$STEP_STATUS{data} = 'ERROR'</cond>
                 <message>"Failed to retrieve content to validate from configured endpoint."</message>
             </case>
+            <!-- Print a specific failure message if the XML validation failed. -->
             <case>
                 <cond>$STEP_STATUS{validation} = 'ERROR'</cond>
                 <message>"Validation of retrieved data failed."</message>

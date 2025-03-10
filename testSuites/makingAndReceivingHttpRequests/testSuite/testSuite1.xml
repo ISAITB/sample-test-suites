@@ -5,6 +5,12 @@
         <gitb:description>Test suite to validate the EU purchase order specification.</gitb:description>
         <gitb:version>1.0</gitb:version>
     </metadata>
+	<!-- 
+		Define the actors involved in the test suite. The test cases referencing an actor with the role of SUT (System Under Test)
+		must be passed to complete conformance testing.
+
+		Depending on options selected during the test suite's upload, the actor definitions will be created or updated in the target specification.
+	-->
     <actors>
         <gitb:actor id="Retailer">
             <gitb:name>Retailer</gitb:name>
@@ -15,6 +21,10 @@
             <gitb:desc>A simulated EU retailer system used for testing purposes.</gitb:desc>
         </gitb:actor>        
     </actors>
+	<!-- 
+		The list of included test cases (referenced using their ID). The ordering of the test cases here defines their execution
+		order when running the test suite.
+	-->
     <testcase id="testCase1_upload"/>
     <testcase id="testCase2_send"/>
     <testcase id="testCase3_receive"/>    

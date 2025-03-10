@@ -4,25 +4,32 @@
         <gitb:name>Test case 2: Simulated retrieval of invalid data (content)</gitb:name>
         <gitb:version>1.0</gitb:version>
         <gitb:description>Simulated retrieval and validation of invalid (content-wise) data via HTTP GET.</gitb:description>
+        <!-- Define a tag to better highlight traits of this test case. -->
         <gitb:tags>
             <gitb:tag foreground="#FFFFFF" background="#FF2E00" name="simulated">Test case with simulated exchanges for demo purposes.</gitb:tag>
         </gitb:tags>
+        <!-- Include HTML documentation for the test case, imported from a HTML file included in the test suite. -->
         <gitb:documentation import="docs/testCase2.html"/>
     </metadata>
+    <!-- Import a resource to be used in this test case. -->
     <imports>
         <artifact type="binary" name="sampleFile">resources/sampleInvalidContent.xml</artifact>
     </imports>
     <actors>
+        <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
         <gitb:actor id="Retailer" role="SUT"/>
         <gitb:actor id="SimulatedRetailer"/>
     </actors>
     <steps>
+        <!-- Use the 'SimulatedMessaging' handler to simulate a call to the SUT. -->
         <assign to="params1{content}">$sampleFile</assign>
         <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging">
             <input name="parameters">$params1</input>
         </send>        
+        <!-- Call a scriptlet to validate the simulated response. -->
         <call path="scriptlets/validate.xml" input="$sampleFile"/>
     </steps>
+    <!-- Print a user-friendly message to summarise the test session's outcome. -->
     <output>
         <success>
             <default>"Test session completed successfully."</default>
