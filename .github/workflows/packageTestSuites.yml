@@ -20,13 +20,13 @@ jobs:
               parent_dir=$(dirname "$suite_dir")  # Get parent directory path
               zip_name="$parent_dir/testSuite.zip"  # Path for ZIP file
 
-              echo "Processing: $suite_dir -> $zip_name"
+              echo "Processing: $suite_dir"
 
               # Remove existing ZIP file if it exists
               rm -f "$zip_name"              
 
               # Create ZIP of the testSuite folder's contents (without including the folder itself)
-              (cd "$suite_dir" && zip -r "$zip_name" ./*) || { echo "Error: Failed to create ZIP for $suite_dir"; exit 1; }              
+              (cd "$suite_dir" && zip -r "../testSuite.zip" ./*) || { echo "Error: Failed to create ZIP for $suite_dir"; exit 1; }              
 
               # Verify ZIP creation
               if [ ! -f "$zip_name" ]; then
