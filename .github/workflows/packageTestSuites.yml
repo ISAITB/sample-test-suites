@@ -26,7 +26,7 @@ jobs:
               rm -f "$zip_name"              
 
               # Create ZIP of the testSuite folder's contents (without including the folder itself)
-              zip -r "$zip_name" "$suite_dir"/* || { echo "Error: Failed to create ZIP for $suite_dir"; exit 1; }
+              (cd "$suite_dir" && zip -r "$zip_name" ./*) || { echo "Error: Failed to create ZIP for $suite_dir"; exit 1; }              
 
               # Verify ZIP creation
               if [ ! -f "$zip_name" ]; then
@@ -41,7 +41,7 @@ jobs:
           git config --global user.email "github-actions@github.com"
       - name: Commit and push ZIP files
         run: |
-          git add testSuites/*/*.zip
-          git commit -m "Add/Update test suite archives"
+          git add testSuites/*/testSuite.zip
+          git commit -m "Update testSuite archives" || echo "No changes to commit"
           git push
         continue-on-error: true  # Prevent failure if nothing to commit          
