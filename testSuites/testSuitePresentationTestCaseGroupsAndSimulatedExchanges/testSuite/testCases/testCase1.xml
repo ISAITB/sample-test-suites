@@ -5,7 +5,7 @@
         <gitb:version>1.0</gitb:version>
         <gitb:description>Provide a valid purchase order when requested via HTTP GET.</gitb:description>
         <!-- Include HTML documentation for the test case, imported from a HTML file included in the test suite. -->
-        <gitb:documentation import="docs/testCase1.html"/>
+        <gitb:documentation import="docs/tc1.html"/>
     </metadata>
     <actors>
         <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->

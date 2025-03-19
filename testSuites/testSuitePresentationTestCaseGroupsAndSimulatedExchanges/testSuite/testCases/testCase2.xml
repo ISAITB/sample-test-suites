@@ -9,7 +9,7 @@
             <gitb:tag foreground="#FFFFFF" background="#FF2E00" name="simulated">Test case with simulated exchanges for demo purposes.</gitb:tag>
         </gitb:tags>
         <!-- Include HTML documentation for the test case, imported from a HTML file included in the test suite. -->
-        <gitb:documentation import="docs/testCase2.html"/>
+        <gitb:documentation import="docs/tc2.html"/>
     </metadata>
     <!-- Import a resource to be used in this test case. -->
     <imports>
