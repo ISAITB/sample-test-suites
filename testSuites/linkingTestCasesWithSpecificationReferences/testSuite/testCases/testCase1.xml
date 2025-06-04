@@ -24,7 +24,7 @@
     </actors>
     <steps>
         <!-- Make a HTTP GET call to retrieve the data to validate with. -->
-        <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
+        <send id="data" desc="Retrieve data to validate" handler="HttpMessagingV2">
             <input name="uri">"https://raw.githubusercontent.com/ISAITB/sample-test-workspace/refs/heads/master/samples/samplePO.xml"</input>
             <input name="method">"GET"</input>
         </send>

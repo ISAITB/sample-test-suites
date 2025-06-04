@@ -21,7 +21,7 @@
             as the payload, which is defined as being of type "text/plain".
         -->
         <assign to="httpHeaders{Content-Type}">"text/plain"</assign>
-        <receive id="dataReceived" desc="Receive request" from="Retailer" to="SimulatedRetailer" handler="HttpMessagingV2">
+        <receive id="dataReceived" desc="Receive request" handler="HttpMessagingV2">
             <input name="uriExtension">"/receiveOrder"</input>
             <input name="method">"POST"</input>
             <input name="status">200</input>

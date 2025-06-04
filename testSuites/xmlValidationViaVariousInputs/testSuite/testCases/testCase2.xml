@@ -17,7 +17,7 @@
             as a custom system-level property in the relevant community. In this case the endpoint address would be referred to as 
             $SYSTEM{address} (assuming the property's key is 'address').
         -->
-        <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
+        <send id="data" desc="Retrieve data to validate" handler="HttpMessagingV2">
             <input name="uri">"https://raw.githubusercontent.com/ISAITB/sample-test-workspace/refs/heads/master/samples/samplePO.xml"</input>
             <input name="method">"GET"</input>
         </send>

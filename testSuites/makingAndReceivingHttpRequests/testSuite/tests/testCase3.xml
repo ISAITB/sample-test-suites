@@ -20,7 +20,7 @@
             payload is the imported XML file from the test suite, and is set with a content type of 'text/xml'.
         -->
         <assign to="httpHeaders{Content-Type}">"text/xml"</assign>
-        <send id="sendData" desc="Send request" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
+        <send id="sendData" desc="Send request" handler="HttpMessagingV2">
             <input name="uri">$SYSTEM{endpoint}</input>
             <input name="method">"POST"</input>
             <input name="body">$purchaseOrder</input>

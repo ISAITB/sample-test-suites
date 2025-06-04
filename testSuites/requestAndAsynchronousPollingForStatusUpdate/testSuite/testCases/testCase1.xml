@@ -36,7 +36,7 @@
         <assign to="messageContentTypes{request}">"application/xml"</assign>
         <assign to="messageContentTypes{response}">"application/xml"</assign>
         <log>"Sending request to retailer system..."</log>
-        <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging">
+        <send id="data" desc="Retrieve data to validate" handler="SimulatedMessaging">
             <input name="parameters">$messageParams</input>
             <input name="contentTypes">$messageContentTypes</input>
         </send>
@@ -92,7 +92,7 @@
                 <assign to="ackParams{response}">$ackResponse</assign>
                 <assign to="ackContentTypes{request}">"application/xml"</assign>
                 <assign to="ackContentTypes{response}">"application/xml"</assign>
-                <send id="ack" desc="Request status" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging">
+                <send id="ack" desc="Request status" handler="SimulatedMessaging">
                     <input name="parameters">$ackParams</input>
                     <input name="contentTypes">$ackContentTypes</input>
                 </send>

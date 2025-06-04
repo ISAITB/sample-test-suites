@@ -23,7 +23,7 @@
     <steps>
         <!-- Use the 'SimulatedMessaging' handler to simulate a call to the SUT. -->
         <assign to="params1{content}">$sampleFile</assign>
-        <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging">
+        <send id="data" desc="Retrieve data to validate" handler="SimulatedMessaging">
             <input name="parameters">$params1</input>
         </send>        
         <!-- Call a scriptlet to validate the simulated response. -->
