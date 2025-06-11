@@ -16,7 +16,7 @@
     </metadata>
     <!-- Define the JSON Schema to use for validations as an imported resource. -->
     <imports>
-        <artifact type="binary" name="schema">resources/PurchaseOrder.json</artifact>
+        <artifact name="schema">resources/PurchaseOrder.json</artifact>
     </imports>
     <actors>
         <gitb:actor id="Retailer" role="SUT"/>
@@ -34,11 +34,9 @@
             This validator is configured without predefined JSON schemas but rather expects these to be provided as part of the input. The two 'assign' steps serve to
             prepare the schema that will be provided to the validator, referring to the test case's imported schema.
         -->
-        <assign to="schema1{schema}">$schema</assign>
-        <assign to="schemasToUse" append="true">$schema1</assign>
-        <verify handler="https://www.itb.ec.europa.eu/json/soap/any/validation?wsdl" desc="Validate purchase order">
-            <input name="contentToValidate">$data{response}{body}</input>
-            <input name="externalSchemas">$schemasToUse</input>
+        <verify handler="JsonValidator" desc="Validate purchase order">
+            <input name="json">$data{response}{body}</input>
+            <input name="schema">$schema</input>
         </verify>
     </steps>
     <!-- Print a user-friendly message to summarise the test session's outcome. -->

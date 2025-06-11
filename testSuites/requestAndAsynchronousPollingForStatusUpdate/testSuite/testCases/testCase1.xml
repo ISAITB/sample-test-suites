@@ -7,9 +7,9 @@
     </metadata>
     <!-- Definition of imported resources that will be used in this test case. -->
     <imports>
-        <artifact type="binary" name="request">resources/messageRequest.xml</artifact>
-        <artifact type="binary" name="response">resources/messageResponse.xml</artifact>
-        <artifact type="binary" name="ackRequestTemplate">resources/ackRequestTemplate.xml</artifact>
+        <artifact name="request">resources/messageRequest.xml</artifact>
+        <artifact name="response">resources/messageResponse.xml</artifact>
+        <artifact name="ackRequestTemplate">resources/ackRequestTemplate.xml</artifact>
     </imports>
     <actors>
         <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
@@ -104,8 +104,9 @@
         </while>
         <!-- Check to ensure that the polling completed with the reported status being 'ACKNOWLEDGED'. -->
         <verify id="checkStatus" desc="Ensure message was acknowledged" handler="StringValidator">
-            <input name="actualstring">$status</input>
-            <input name="expectedstring">"ACKNOWLEDGED"</input>
+            <input name="actual">$status</input>
+            <input name="expected">"ACKNOWLEDGED"</input>
+            <input name="failureMessage">"The message was not reported as acknowledged."</input>
         </verify>
     </steps>
     <!-- Print a user-friendly message to summarise the test session's outcome. -->

@@ -2,7 +2,7 @@
 <testsuite id="example2" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<metadata>
 		<gitb:name>Example 2: JSON validations</gitb:name>
-		<gitb:description>Example focusing on using an external validator and using templates.</gitb:description>
+		<gitb:description>Example focusing on JSON validation using templates.</gitb:description>
 		<gitb:version>1.0</gitb:version>
 	</metadata>
 	<!-- 

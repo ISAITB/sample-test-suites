@@ -14,7 +14,7 @@
         <!--
             Request the message to send to the messaging service.
         -->
-        <interact id="data" desc="Request message">
+        <interact id="data" desc="Request message" required="true">
             <request name="messageToSend" desc="Enter the message to send:"/>
         </interact>
         <!--

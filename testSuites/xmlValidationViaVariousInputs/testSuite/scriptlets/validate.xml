@@ -2,8 +2,8 @@
 <scriptlet id="validate" xmlns="http://www.gitb.com/tdl/v1/">
     <!-- Imports for the XSD and Schematron files to use for XML validation. -->
     <imports>
-        <artifact type="binary" name="schema">resources/PurchaseOrder.xsd</artifact>
-        <artifact type="binary" name="schematron">resources/LargePurchaseOrder.sch</artifact>
+        <artifact name="schema">resources/PurchaseOrder.xsd</artifact>
+        <artifact name="schematron">resources/LargePurchaseOrder.sch</artifact>
     </imports>    
     <!-- Scriptlet input parameter for the XML data to validate.-->
     <params>

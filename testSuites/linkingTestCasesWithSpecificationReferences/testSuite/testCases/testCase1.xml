@@ -16,7 +16,7 @@
     </metadata>
     <!-- Define the XSD to use for validations as an imported resource. -->
     <imports>
-        <artifact type="binary" name="schema">resources/PurchaseOrder.xsd</artifact>
+        <artifact name="schema">resources/PurchaseOrder.xsd</artifact>
     </imports>
     <actors>
         <gitb:actor id="Retailer" role="SUT"/>

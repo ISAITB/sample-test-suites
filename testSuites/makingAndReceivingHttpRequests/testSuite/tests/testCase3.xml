@@ -7,7 +7,7 @@
     </metadata>
     <!-- Define a fixed XML sample file to use when calling the target system's endpoint. -->
     <imports>
-        <artifact type="binary" encoding="UTF-8" name="purchaseOrder">resources/sample.xml</artifact>
+        <artifact name="purchaseOrder">resources/sample.xml</artifact>
     </imports>
     <actors>
         <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
@@ -28,18 +28,21 @@
         </send>
         <!-- Validate that the response was has a 200 (OK) status. -->
         <verify handler="StringValidator" desc="Validate status">
-            <input name="actualstring">$sendData{response}{status}</input>
-            <input name="expectedstring">"200"</input>
+            <input name="actual">$sendData{response}{status}</input>
+            <input name="expected">"200"</input>
+            <input name="failureMessage">"The received HTTP status was not 200."</input>
         </verify>
-        <!-- Validate tha the response's content type was of type 'text/plain'. -->
+        <!-- Validate that the response's content type was of type 'text/plain'. -->
         <verify handler="StringValidator" desc="Validate content type">
-            <input name="actualstring">$sendData{response}{headers}{Content-Type}</input>
-            <input name="expectedstring">"text/plain"</input>
+            <input name="actual">$sendData{response}{headers}{Content-Type}</input>
+            <input name="expected">"text/plain"</input>
+            <input name="failureMessage">"The response content type was not 'text/plain'."</input>
         </verify>
         <!-- Make sure that the body was an identifier matching the provided regular expression. -->
         <verify handler="RegExpValidator" desc="Validate reference identifier">
             <input name="input">$sendData{response}{body}</input>
             <input name="expression">"^REF\-\d+$"</input>
+            <input name="failureMessage">"The returned identifier has an invalid format."</input>
         </verify>
     </steps>
     <!-- Print a user-friendly message to summarise the test session's outcome. -->
