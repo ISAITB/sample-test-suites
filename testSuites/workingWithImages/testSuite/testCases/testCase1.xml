@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcase id="testCase1" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/">
+    <metadata>
+        <gitb:name>Test case 1: Process presented QR code</gitb:name>
+        <gitb:version>1.0</gitb:version>
+        <gitb:description>Process retrieved QR code and upload evidence of performed actions as an image.</gitb:description>
+    </metadata>
+    <actors>
+        <gitb:actor id="User" role="SUT"/>
+        <gitb:actor id="Portal"/>
+    </actors>
+    <steps stopOnError="true">
+        <!-- Make a HTTP GET call to retrieve the QR code. -->
+        <send id="data" desc="Retrieve QR code" handler="HttpMessagingV2" hidden="true">
+            <input name="uri">"https://www.itb.ec.europa.eu/files/sample_qr_code.png"</input>
+        </send>
+        <!-- Extract the content type of the image. We use the 'find' operation from 'CollectionUtils' to ignore unexpected casing. -->
+        <process output="contentType" handler="CollectionUtils" operation="find">
+            <input name="map">$data{response}{headers}</input>
+            <input name="value">"Content-Type"</input> 
+            <input name="ignoreCase">true()</input>
+        </process>
+        <!-- Display the QR code and a help message. -->
+        <interact inputTitle="Test instructions" desc="Test instructions">
+            <!-- Display an instruction for the next steps to perform. -->
+            <instruct desc="Next step" forceDisplay="true">"To proceed scan the QR code the follow the contained link. In the next step you will be requested with proof (a screenshot) that you followed the link."</instruct>
+            <!-- Display the retrieved QR code. -->
+            <instruct desc="QR code to process" mimeType="$contentType">$data{response}{body}</instruct>
+        </interact>
+        <!-- Request the URL that was visited (required), a screenshot (required), the screenshot type (optional), and comments (optional). -->
+        <interact id="inputs" inputTitle="Test inputs" desc="Test inputs">
+            <request name="qrCodeUrl" desc="Address visited through the QR code" required="true"/>
+            <request name="screenshot" desc="Screenshot" inputType="UPLOAD" fileName="screenshotFile" required="true"/>
+            <request name="screenshotType" desc="Screenshot type" inputType="SELECT_SINGLE" options="image/png,image/jpeg,image/gif" optionLabels="PNG,JPG,GIF"/>
+            <request name="comments" desc="Comments" inputType="MULTILINE_TEXT"/>
+        </interact>
+        <!-- Verify that the expected URL was the one visited through the QR code. -->
+        <verify handler="StringValidator" desc="Check visited URL">
+            <input name="actual">$inputs{qrCodeUrl}</input>
+            <input name="expected">"https://www.itb.ec.europa.eu"</input>
+            <input name="successMessage">"The address visited was the correct one."</input>
+            <input name="failureMessage">"The address visited was not the one included in the QR code."</input>
+        </verify>        
+        <!-- Use an XPath if/else in case no content type was provided so that we determine it from the uploaded screenshot file's name. -->
+        <assign to="screenshotTypeToUse">if ($inputs{screenshotType} != '') then $inputs{screenshotType} else if (ends-with(lower-case($inputs{screenshotFile}), '.png')) then 'image/png' else if (ends-with(lower-case($inputs{screenshotFile}), '.gif')) then 'image/gif' else 'image/jpeg'</assign>
+        <!-- Log the determined screenshot type. -->
+        <log>"The uploaded screenshot will be processed using content type " || $screenshotTypeToUse</log>
+        <!-- Prepare a final summary report using the 'DisplayProcessor'. -->
+        <assign to="parameters{qrCode}">$data{response}{body}</assign>
+        <assign to="parameters{screenshot}">$inputs{screenshot}</assign>
+        <assign to="parameters{visitedUrl}">$inputs{qrCodeUrl}</assign>
+        <assign to="parameters{comments}">$inputs{comments}</assign>
+        <assign to="contentTypes{qrCode}">$contentType</assign>
+        <assign to="contentTypes{screenshot}">$screenshotTypeToUse</assign>
+        <process desc="Summary report" handler="DisplayProcessor" hidden="false">
+            <input name="parameters">$parameters</input>
+            <input name="contentTypes">$contentTypes</input>
+        </process>
+    </steps>
+    <!-- Print a user-friendly message to summarise the test session's outcome. -->
+    <output>
+        <success>
+            <default>"Test session completed successfully."</default>
+        </success>
+        <failure>
+            <default>"Test session failed. Check the step reports for details."</default>
+        </failure>
+    </output>    
+</testcase>
