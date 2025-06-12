@@ -13,17 +13,14 @@
     <steps>
         <log>"Validating content with JSON schema..."</log>
         <!--
-            Validate using an external validator (in this case the Test Bed's generic JSON validator) by passing both the content to validate
-            and the schema(s) to validate it with.
+            Validate using the built-in JsonValidator by passing both the content to validate and the schema(s) to validate it with.
 
             Note here how the step's description is set dynamically from the relevant scriptlet's parameter. Doing so is possible only
             within scriptlets, given that the parameter's value can be determined as a constant value once the test case is initially loaded.
         -->
-        <assign to="schema1{schema}">$schema</assign>
-        <assign to="schemasToUse" append="true">$schema1</assign>
-        <verify id="validation" handler="https://www.itb.ec.europa.eu/json/soap/any/validation?wsdl" desc="$description">
-            <input name="contentToValidate">$content</input>
-            <input name="externalSchemas">$schemasToUse</input>
+        <verify id="validation" handler="JsonValidator" desc="$description">
+            <input name="json">$content</input>
+            <input name="schema">$schema</input>
         </verify>
         <!-- We can refer to previous steps' outcomes using the built-in STEP_STATUS map. -->
         <log>"Validation result was: " || $STEP_STATUS{validation}</log>

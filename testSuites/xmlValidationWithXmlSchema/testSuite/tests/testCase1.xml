@@ -7,7 +7,7 @@
     </metadata>
     <!-- Import the XSD to use for XML validation. -->
     <imports>
-        <artifact type="schema" encoding="UTF-8" name="purchaseOrderXSD">resources/PurchaseOrder.xsd</artifact>
+        <artifact name="purchaseOrderXSD">resources/PurchaseOrder.xsd</artifact>
     </imports>
     <actors>
         <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
@@ -15,7 +15,7 @@
     </actors>
     <steps>
         <!-- Present a popup to the user requesting the XML data to validate (provided via file upload). -->
-        <interact id="userData" desc="Upload purchase order">
+        <interact id="userData" desc="Upload purchase order" required="true">
             <request desc="Purchase order to validate:" name="order" inputType="UPLOAD"/>
         </interact>
         <!-- Use the built-in 'XmlValidator' to validate the uploaded XML data against the imported XSD. -->

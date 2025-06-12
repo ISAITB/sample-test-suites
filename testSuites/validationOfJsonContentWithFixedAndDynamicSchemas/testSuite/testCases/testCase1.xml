@@ -7,8 +7,8 @@
     </metadata>
     <!-- Import resources from the test suite to be used in this test case. -->
     <imports>
-        <artifact type="binary" name="schema">resources/schema.json</artifact>
-        <artifact type="binary" name="schemaTemplate">resources/schemaTemplate.txt</artifact>
+        <artifact name="schema">resources/schema.json</artifact>
+        <artifact name="schemaTemplate">resources/schemaTemplate.txt</artifact>
     </imports>
     <actors>
         <!-- Flag the SUT actor to include this test case in the actor's required tests for relevant conformance statements. -->
@@ -36,7 +36,7 @@
             most likely defined as a custom system-level property in the relevant community. In this case the endpoint
             address would be referred to as $SYSTEM{address} (assuming the property's key is 'address').
         -->
-        <send id="data" stopOnError="true" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
+        <send id="data" stopOnError="true" desc="Retrieve data to validate" handler="HttpMessagingV2">
             <input name="uri">"https://raw.githubusercontent.com/ISAITB/validator-resources-json-sample/refs/heads/master/etc/sample.json"</input>
             <input name="method">"GET"</input>
         </send>

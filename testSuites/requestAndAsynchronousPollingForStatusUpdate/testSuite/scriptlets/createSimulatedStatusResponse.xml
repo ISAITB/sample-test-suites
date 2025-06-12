@@ -2,7 +2,7 @@
 <scriptlet id="createSimulatedStatusResponse" xmlns="http://www.gitb.com/tdl/v1/">
     <!-- Import the template to use to generate the simulated response. -->
     <imports>
-        <artifact type="binary" name="ackResponseTemplate">resources/ackResponseTemplate.xml</artifact>
+        <artifact name="ackResponseTemplate">resources/ackResponseTemplate.xml</artifact>
     </imports>
     <!-- Define as parameters for the scriptlet the correlation ID we are looking for and the maximum attempts to make. -->
     <params>
@@ -17,7 +17,7 @@
             We define the 'options' attribute to present this in a dropdown selection.
         -->
         <interact inputTitle="Simulation behaviour" hidden="true">
-            <request desc="Response to return from simulated status request" options="PENDING,FAILED,ACKNOWLEDGED">$simulatedStatusResponse</request>
+            <request desc="Response to return from simulated status request" options="PENDING,FAILED,ACKNOWLEDGED" required="true">$simulatedStatusResponse</request>
             <instruct desc="Help" forceDisplay="true">"Selecting 'FAILED' or 'ACKNOWLEDGED' will complete the simulated polling, while 'PENDING' will continue unless the maximum attempts (" || $maxAttempts || ") are reached."</instruct>
         </interact>
         <!--

@@ -16,7 +16,7 @@
     </metadata>
     <!-- Define the XSD to use for validations as an imported resource. -->
     <imports>
-        <artifact type="binary" name="schema">resources/PurchaseOrder.xsd</artifact>
+        <artifact name="schema">resources/PurchaseOrder.xsd</artifact>
     </imports>
     <actors>
         <gitb:actor id="Retailer" role="SUT"/>
@@ -24,7 +24,7 @@
     </actors>
     <steps>
         <!-- Make a HTTP GET call to retrieve the data to validate with. -->
-        <send id="data" desc="Retrieve data to validate" from="SimulatedRetailer" to="Retailer" handler="HttpMessagingV2">
+        <send id="data" desc="Retrieve data to validate" handler="HttpMessagingV2">
             <input name="uri">"https://raw.githubusercontent.com/ISAITB/sample-test-workspace/refs/heads/master/samples/samplePO.xml"</input>
             <input name="method">"GET"</input>
         </send>

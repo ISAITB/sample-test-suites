@@ -17,8 +17,8 @@
             This is the group with setup steps, which we ensure will all execute before proceeding.
         -->
         <group title="Setup steps" collapsed="true" stopOnChildError="false">
-            <send desc="Create dataset 1" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging"/>
-            <send desc="Create dataset 2" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging"/>
+            <send desc="Create dataset 1" handler="SimulatedMessaging"/>
+            <send desc="Create dataset 2" handler="SimulatedMessaging"/>
         </group>
         <!--
             In this group we hide the group's boundary using the 'hiddenContainer' attribute as we want to only show its included
@@ -28,15 +28,15 @@
         -->
         <group hiddenContainer="true" stopOnChildError="true">
             <group title="Step 1" desc="Check message 1">
-                <send desc="Send message 1" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging"/>
+                <send desc="Send message 1" handler="SimulatedMessaging"/>
                 <process desc="Validate message 1" hidden="false" handler="DisplayProcessor"/>
             </group>
             <group title="Step 2" desc="Check message 2">
-                <send desc="Send message 2" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging"/>
+                <send desc="Send message 2" handler="SimulatedMessaging"/>
                 <process desc="Validate message 2" hidden="false" handler="DisplayProcessor"/>
             </group>
             <group title="Step 3" desc="Check message 3">
-                <receive desc="Receive message 3" from="Retailer" to="SimulatedRetailer" handler="SimulatedMessaging"/>
+                <receive desc="Receive message 3" handler="SimulatedMessaging"/>
                 <process desc="Validate message 3" hidden="false" handler="DisplayProcessor"/>
             </group>
         </group>
@@ -47,8 +47,8 @@
             steps will not cause the test session to fail in case of error.
         -->
         <group title="Teardown steps" collapsed="true" stopOnChildError="false">
-            <send desc="Remove dataset 1" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging" level="WARNING"/>
-            <send desc="Remove dataset 2" from="SimulatedRetailer" to="Retailer" handler="SimulatedMessaging" level="WARNING"/>
+            <send desc="Remove dataset 1" handler="SimulatedMessaging" level="WARNING"/>
+            <send desc="Remove dataset 2" handler="SimulatedMessaging" level="WARNING"/>
         </group>
     </steps>
     <!-- Print a user-friendly message to summarise the test session's outcome. -->
