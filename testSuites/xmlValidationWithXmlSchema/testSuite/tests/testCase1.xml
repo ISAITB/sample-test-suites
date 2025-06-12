@@ -15,8 +15,8 @@
     </actors>
     <steps>
         <!-- Present a popup to the user requesting the XML data to validate (provided via file upload). -->
-        <interact id="userData" desc="Upload purchase order" required="true">
-            <request desc="Purchase order to validate:" name="order" inputType="UPLOAD"/>
+        <interact id="userData" desc="Upload purchase order">
+            <request desc="Purchase order to validate:" name="order" inputType="UPLOAD" required="true"/>
         </interact>
         <!-- Use the built-in 'XmlValidator' to validate the uploaded XML data against the imported XSD. -->
         <verify handler="XmlValidator" desc="Validate purchase order">
