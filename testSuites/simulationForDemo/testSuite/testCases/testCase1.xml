@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcase id="testCase1" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/">
+    <metadata>
+        <gitb:name>Test case 1: Demonstration of order and backend invoice processing</gitb:name>
+        <gitb:version>1.0</gitb:version>
+        <gitb:description>Simulation-based test case that sends a purchase order to a retailer, so that this eventually is processed by its back office and invoicing service to generate an invoice to send back to the order creator.</gitb:description>
+    </metadata>
+    <!-- Import resources from the test suite to be used in this test case. -->
+    <imports>
+        <artifact name="order">resources/order.json</artifact>
+        <artifact name="invoice">resources/invoice.xml</artifact>
+    </imports>
+    <actors>
+        <gitb:actor id="Retailer" role="SUT"/>
+        <gitb:actor id="OtherRetailer"/>
+        <gitb:actor id="BackOffice"/>
+        <gitb:actor id="Invoicing"/>
+    </actors>
+    <!-- Define the delay between steps. This could also be retrieved from e.g. a domain configuration parameter. -->
+    <variables>
+        <var name="delay" type="number">
+            <value>1000</value>
+        </var>
+    </variables>
+    <steps>
+        <assign to="parameters1{order}">$order</assign>
+        <assign to="contentTypes1{order}">"application/json"</assign>
+        <!-- Use groups for a better visual separation of the overall steps in the process. -->
+        <group title="Step 1: Order submission" desc="Prepare the order and send it to the receiving retailer">
+            <!-- Use the 'DelayProcessor' to delay the execution of the following step (simulating asynchronous processing). -->
+            <process handler="DelayProcessor" input="$delay"/>
+            <!-- Use the 'DisplayProcessor' to illustrate processing steps. -->
+            <process handler="DisplayProcessor" desc="Prepare order" hidden="false">
+                <input name="parameters">$parameters1</input>
+                <input name="contentTypes">$contentTypes1</input>
+            </process>
+            <process handler="DelayProcessor" input="$delay"/>
+            <!--
+                Use a 'send' step with a 'SimulatedMessaging' to simulate exchanges between systems.
+                In this case we specify the 'from' and 'to' actors given that we have multiple test case actors.
+            -->
+            <send desc="Send purchase order" handler="SimulatedMessaging" from="Retailer" to="OtherRetailer">
+                <input name="parameters">$parameters1</input>
+                <input name="contentTypes">$contentTypes1</input>
+            </send>
+        </group>
+        <!--
+            Second logical step using similarly a group, and simulated delays, processing and sending.
+        -->
+        <group title="Step 2: Order processing" desc="Receive the order, validate it and proceed with backend processing">
+            <process handler="DelayProcessor" input="$delay"/>
+            <process handler="DisplayProcessor" desc="Validate received order" hidden="false">
+                <input name="parameters">$parameters1</input>
+                <input name="contentTypes">$contentTypes1</input>
+            </process>
+            <process handler="DelayProcessor" input="$delay"/>
+            <send desc="Submit order for processing" handler="SimulatedMessaging" from="OtherRetailer" to="BackOffice">
+                <input name="parameters">$parameters1</input>
+                <input name="contentTypes">$contentTypes1</input>
+            </send>
+            <process handler="DelayProcessor" input="$delay"/>
+            <process handler="DisplayProcessor" desc="Process order" hidden="false">
+                <input name="parameters">$parameters1</input>
+                <input name="contentTypes">$contentTypes1</input>
+            </process>
+        </group>
+        <!--
+            Third logical step using similarly a group, and simulated delays, processing and sending.
+        -->
+        <group title="Step 3: Invoicing" desc="Prepare the invoice and send it to the order's creator">
+            <process handler="DelayProcessor" input="$delay"/>
+            <send desc="Request invoice creation" handler="SimulatedMessaging" from="BackOffice" to="Invoicing">
+                <input name="parameters">$parameters1</input>
+                <input name="contentTypes">$contentTypes1</input>
+            </send>
+            <process handler="DelayProcessor" input="$delay"/>
+            <assign to="parameters2{order}">$order</assign>
+            <assign to="parameters2{invoice}">$invoice</assign>
+            <assign to="contentTypes2{order}">"application/json"</assign>
+            <assign to="contentTypes2{invoice}">"application/xml"</assign>
+            <process handler="DisplayProcessor" desc="Prepare invoice" hidden="false">
+                <input name="parameters">$parameters2</input>
+                <input name="contentTypes">$contentTypes2</input>
+            </process>
+            <process handler="DelayProcessor" input="$delay"/>
+            <send desc="Send invoice to be paid" handler="SimulatedMessaging" from="Invoicing" to="Retailer">
+                <input name="parameters">$parameters2</input>
+                <input name="contentTypes">$contentTypes2</input>
+            </send>
+            <process handler="DelayProcessor" input="$delay"/>
+            <send desc="Pay invoice" handler="SimulatedMessaging" from="Retailer" to="OtherRetailer"/>
+        </group>
+    </steps>
+    <!-- Print a user-friendly message to summarise the demonstrated scenario. -->
+    <output>
+        <success>
+            <default>"Demonstration completed. This illustrated how a purchase order is sent to a retailer, and subsequently processed to result in the final invoicing and payment. Feel free to click on the steps' reports for more details."</default>
+        </success>
+    </output>    
+</testcase>
