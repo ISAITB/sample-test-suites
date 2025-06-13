@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcase id="testCase1" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/">
+    <metadata>
+        <gitb:name>Test case 1: Submit evidences for administrator verification</gitb:name>
+        <gitb:version>1.0</gitb:version>
+        <gitb:description>Provide a JSON file (based on two provided samples) for validation and in case of error provide comments for an administrator to manually review.</gitb:description>
+    </metadata>
+    <!-- Import resources from the test suite to be used in this test case. -->
+    <imports>
+        <artifact name="schema">resources/schema.json</artifact>
+        <artifact name="sampleValid">resources/sampleValid.json</artifact>
+        <artifact name="sampleInvalid">resources/sampleInvalid.json</artifact>
+    </imports>
+    <actors>
+        <gitb:actor id="User" role="SUT"/>
+    </actors>
+    <!--
+        We set 'stopOnError' to true to immediately stop in case a step fails. Note that the verify step that 
+        validates the JSON document is set at warning level, and as such will not result in the session stopping.
+        If however the user provides a completely invalid input that results in an error (e.g. the document is
+        not JSON), the session will stop.
+    -->
+    <steps stopOnError="true">
+        <!-- Request the JSON document to validate and provide instructions and ready-ti-use samples. -->
+        <interact id="input" inputTitle="Provide input" desc="Provide JSON document to validate">
+            <!-- Display an instruction for the next steps to perform. -->
+            <instruct desc="Next step" forceDisplay="true">"To proceed provide the JSON document to validate in the provided code editor. You can use the provided samples or use your own document."</instruct>
+            <!-- The input for the JSON document to validate. -->
+            <request desc="Document to validate" name="data" required="true" inputType="CODE" mimeType="application/json"/>
+            <!-- The valid sample. -->
+            <instruct desc="Sample document (valid)" mimeType="application/json">$sampleValid</instruct>
+            <!-- The invalid sample. -->
+            <instruct desc="Sample document (invalid)" mimeType="application/json">$sampleInvalid</instruct>
+        </interact>
+        <!-- Validate the document. We set the 'level' to 'WARNING' to avoid the step from failing if the validation fails. -->
+        <verify id="validation" desc="Validate document" handler="JsonValidator" level="WARNING">
+            <input name="json">$input{data}</input>
+            <input name="schema">$schema</input>
+        </verify>
+        <!-- Conditionally make the manual administrator review. We only do this is we have validation warnings. -->
+        <if title="Manual review" desc="Validation returned warnings?">
+            <cond>$STEP_STATUS{validation} = 'WARNING'</cond>
+            <then>
+                <!-- Ask the user to provide comments for the administrator's review. -->
+                <interact id="comment" inputTitle="Provide comments" desc="Provide comments for administrator review">
+                    <instruct desc="Next step" forceDisplay="true">"Provide the comments from the administrator's review."</instruct>
+                    <request desc="Comments" inputType="MULTILINE_TEXT" name="data" required="true"/>
+                </interact>
+                <!-- 
+                    Ask the administrator to review. The key point here is 'admin' set to true. If the currently connected
+                    user is a community or Test Bed administrator this interaction will execute immediately. Otherwise the
+                    test session will pause until an administrator has completed the step.
+                -->
+                <interact id="review" inputTitle="Review warnings" desc="Review validation warnings" admin="true">
+                    <instruct desc="Provided comments">$comment{data}</instruct>
+                    <request desc="Review comments" inputType="MULTILINE_TEXT" name="data" required="true"/>
+                    <!--
+                        Here we set 'report' to false so that this input is not presented in the step's report (which is also visible to the tester).
+                        Alternatively we could also have set the full step as hidden, however by displaying the step we it is clear at which step
+                        the test session is pending.
+                    -->
+                    <request desc="Review result" inputType="SELECT_SINGLE" name="result" required="true" options="OK,NOK" optionLabels="Validation accepted, Validation rejected" report="false"/>
+                </interact>
+                <!-- Check whether the administrator decided that the result is OK. -->
+                <verify id="reviewCheck" desc="Verify review result" handler="ExpressionValidator">
+                    <input name="expression">$review{result} = 'OK'</input>
+                    <input name="successMessage">"The review concluded that the test should succeed."</input>
+                    <input name="failureMessage">"The review concluded that the test should fail."</input>
+                </verify>
+            </then>
+        </if>
+    </steps>
+    <!-- Print a user-friendly message to summarise the test session's outcome. -->
+    <output>
+        <success>
+            <case>
+                <cond>$TEST_SUCCESS and $STEP_STATUS{validation} = 'COMPLETED'</cond>
+                <message>"The test session completed successfully without needing administrator review as the provided document was valid."</message>
+            </case>
+            <case>
+                <cond>$TEST_SUCCESS and $STEP_STATUS{reviewCheck} = 'COMPLETED'</cond>
+                <message>"The test session completed successfully after the validation warnings were reviewed by an administrator."</message>
+            </case>
+            <default>"Test session completed successfully."</default>
+        </success>
+        <failure>
+            <default>"Test session failed. Check the step reports for details."</default>
+        </failure>
+    </output>    
+</testcase>
