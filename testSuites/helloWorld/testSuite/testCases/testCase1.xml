@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcase id="testCase1" xmlns="http://www.gitb.com/tdl/v1/" xmlns:gitb="http://www.gitb.com/core/v1/">
+    <metadata>
+        <gitb:name>Test case 1: Hello world</gitb:name>
+        <gitb:version>1.0</gitb:version>
+        <gitb:description>Test case that asks for the user's name and responds by saying hello.</gitb:description>
+    </metadata>
+    <actors>
+        <!-- Define which test suite actor is the System Under Test (SUT). -->
+        <gitb:actor id="User" role="SUT"/>
+    </actors>
+    <steps>
+        <!-- Present a popup requesting the user's name as a required input. -->
+        <interact id="input" desc="Tell me your name">
+            <request name="name" desc="What's your name?" required="true"/>
+        </interact>
+        <!-- Present a second popup (but hide it on the test execution diagram) to respond. -->
+        <interact hidden="true">
+            <!-- Construct the greeting message based on the user's input. -->
+            <instruct desc="Greeting">"Hello " || $input{name} || "!"</instruct>
+        </interact>
+    </steps>
+    <!-- Show a user-friendly message once the test session completes successfully. -->
+    <output>
+        <success>
+            <default>"Test session completed successfully."</default>
+        </success>
+    </output>     
+</testcase>
